@@ -1,10 +1,13 @@
+console.log("ScanLogger import:", ScanLogger);
 import ScanLogger from "./ScanLogger";
-
 import { getSupabase } from "@/lib/supabase/client";
 
-type Props = { params: { short: string } };
+export default async function TagResolverPage({
+  params,
+}: {
+  params: { short: string };
+}) {
 
-export default async function TagResolverPage({ params }: Props) {
   const short = params.short;
 
   const supabase = getSupabase();
