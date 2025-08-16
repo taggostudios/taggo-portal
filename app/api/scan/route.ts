@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+// was: import { createClient } from "@/lib/supabase/client";
 import { getSupabase } from "@/lib/supabase/client";
 
 export async function GET() {
@@ -7,13 +8,17 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const { short, deviceHash } = await req.json();
+    const { short, deviceHash } = (await req.json()) as {
+      short?: string;
+      deviceHash?: string;
+    };
     if (!short) {
       return NextResponse.json({ error: "short is required" }, { status: 400 });
     }
 
-    const supabase = getSupabase();
+    const supabase = getSupabase(); // 👈 gebruik onze helper
 
+    // tag zoeken
     const { data: tagRow, error: tagErr } = await supabase
       .from("tags")
       .select("id")
@@ -24,10 +29,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "tag not found" }, { status: 404 });
     }
 
+    // IP uit headers
     const fwd = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
     const real = req.headers.get("x-real-ip")?.trim();
     const ip = real ?? fwd ?? undefined;
 
+    // scan loggen
     const { error: insErr } = await supabase.from("scans").insert({
       tag_id: tagRow.id,
       device_hash: deviceHash ?? "anon",
@@ -38,10 +45,8 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ ok: true });
-} catch (e: unknown) {
+  } catch (e: unknown) {
     const message = e instanceof Error ? e.message : "unknown error";
     return NextResponse.json({ error: message }, { status: 500 });
   }
-  
-  
 }
