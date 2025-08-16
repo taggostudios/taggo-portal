@@ -1,23 +1,14 @@
-console.log("ScanLogger import:", ScanLogger);
 import ScanLogger from "./ScanLogger";
-import { getSupabase } from "@/lib/supabase/client";
+import supabase from "@/lib/supabase";
 
-export default async function TagResolverPage({
-  params,
-}: {
-  params: Promise<{ short: string }>;
-}) {
-  const { short } = await params; // 👈 belangrijk in Next 15
-  const supabase = getSupabase();
+export default async function Page({ params }: { params: { short: string } }) {
+  const { short } = params;
 
   const { data: statusRow, error } = await supabase
     .from("tag_status")
-    .select("*")
+    .select("active, unique_scans_30d, last_scan_at")
     .eq("short", short)
-    .maybeSingle();
-
-  // ...rest van je component ongewijzigd
-}
+    .single();
 
   if (error) {
     return (
@@ -64,4 +55,3 @@ export default async function TagResolverPage({
     </main>
   );
 }
-
