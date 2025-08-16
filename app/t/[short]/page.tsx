@@ -5,17 +5,19 @@ import { getSupabase } from "@/lib/supabase/client";
 export default async function TagResolverPage({
   params,
 }: {
-  params: { short: string };
+  params: Promise<{ short: string }>;
 }) {
-
-  const short = params.short;
-
+  const { short } = await params; // 👈 belangrijk in Next 15
   const supabase = getSupabase();
+
   const { data: statusRow, error } = await supabase
     .from("tag_status")
     .select("*")
     .eq("short", short)
     .maybeSingle();
+
+  // ...rest van je component ongewijzigd
+}
 
   if (error) {
     return (
