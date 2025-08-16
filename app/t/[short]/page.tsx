@@ -1,18 +1,17 @@
-import ScanLogger from "./ScanLogger"; // exact zo, zonder .tsx
+import ScanLogger from "./ScanLogger";
 
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ short: string }>;
+}) {
+  const { short } = await params;
 
-type PageProps = {
-  params: {
-    short: string;
-  };
-};
-
-export default function Page({ params }: PageProps) {
   return (
     <main className="p-6">
-      <h1 className="text-2xl font-bold">Tag: {params.short}</h1>
+      <h1 className="text-2xl font-bold">Tag: {short}</h1>
       <p className="text-gray-600">Resolver online ✅</p>
-      <ScanLogger short={params.short} />
+      <ScanLogger short={short} />
     </main>
   );
 }
